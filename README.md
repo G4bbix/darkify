@@ -2,14 +2,16 @@
 An algorythm to generate a dark mode from existing CSS variables
 
 usage: darkify [-h|--help] -i|--inputFile "<value>" [-b|--new-bg "<value>"]
+ 
+  Generates dark theme CSS vars based on an existing collection of colorVars
 
-               Generates dark theme CSS vars based on an existing collection of
-               colorVars
-
-Arguments:
+  
+## Arguments:
 
   -h  --help       Print help information
+  
   -i  --inputFile  File with CSS light var definitons
+  
   -b  --new-bg     The hexcode of the desired background. Default: #222
   
   
