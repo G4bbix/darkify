@@ -1,9 +1,0 @@
-:root {
-  --colorWhite: #ffffff;
-  --colorBlack: #000;
-  --colorDefault: #234567;
-  --colorRed: #ff0000;
-  --colorTeal:  #00ffff;
-  --colorHeading: #9fae30;
-  --colorHeading2: #404000;
-}
