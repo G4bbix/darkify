@@ -19,12 +19,9 @@ func Calc_percieved_brightness(rgb [3]uint8) uint8 {
 func Darkify(light_rgb [3]uint8, mid_point_sum float32) [3]uint8 {
 	var sum_light_rgb uint16 = uint16(light_rgb[0]) + uint16(light_rgb[1]) + uint16(light_rgb[2])
 	var sum_dark_rgb uint16 = uint16(calc_dark_rgb_sum(sum_light_rgb, mid_point_sum))
-	// // fmt.Println(sum_dark_rgb)
-	// // fmt.Println(sum_light_rgb)
 	distribution := calc_distribution(light_rgb, sum_light_rgb)
 	dark_rgb, leftover := initCalc(sum_dark_rgb, light_rgb, distribution)
 	if leftover > 0 {
-		// fmt.Printf("leftover: %d\n", leftover)
 		distribute_leftovers(&dark_rgb, leftover)
 	}
 	return dark_rgb
@@ -32,7 +29,6 @@ func Darkify(light_rgb [3]uint8, mid_point_sum float32) [3]uint8 {
 
 func calc_dark_rgb_sum(sum_light_rgb uint16, mid_point_sum float32) int16 {
 	var offset int16 = int16(sum_light_rgb) - int16(mid_point_sum*2)
-	// fmt.Printf("%d = %d - (%f * 2) \n", offset, sum_light_rgb, mid_point_sum)
 	// if offset is negative, invert the algabreic sign
 	if offset < 0 {
 		return offset / -1
@@ -86,7 +82,6 @@ func distribute_leftovers(color *[3]uint8, leftover uint16) {
 			remainingDistSum += int16(255 - segment)
 		}
 	}
-	// fmt.Println(remainingDistSum)
 
 	// Calculate new distribution
 	var dist [3]float64
@@ -94,6 +89,8 @@ func distribute_leftovers(color *[3]uint8, leftover uint16) {
 		if segment != 255 {
 			if amount_zeros == 2 {
 				dist[i] = 0.5
+			} else if amount_zeros == 1 {
+				dist[i] = 1
 			} else {
 				dist[i] = float64(remainingDistSum) / float64(segment)
 			}
@@ -101,7 +98,6 @@ func distribute_leftovers(color *[3]uint8, leftover uint16) {
 			dist[i] = 0
 		}
 	}
-	// fmt.Println(dist)
 
 	var val uint16
 	var leftover_to_dist uint16
@@ -111,7 +107,6 @@ func distribute_leftovers(color *[3]uint8, leftover uint16) {
 	for i := range *color {
 		if dist[i] != 255 {
 			leftover_to_dist = uint16(float64(leftover) * dist[i])
-			// fmt.Println(leftover_to_dist)
 			leftover_distributed += leftover_to_dist
 			val = leftover_to_dist + uint16(color[i])
 			if val > 255 {
@@ -121,7 +116,6 @@ func distribute_leftovers(color *[3]uint8, leftover uint16) {
 			}
 		}
 	}
-	// fmt.Println(*color)
 	var remaining_leftover uint16 = leftover - leftover_distributed
 	if remaining_leftover > 0 {
 		for i, segment := range *color {

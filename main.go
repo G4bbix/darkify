@@ -14,7 +14,6 @@ func main() {
 	// fmt.Println(mid_point_sum)
 	var dark_css_vars_rgb = make(map[string][3]uint8)
 	for key, value := range light_css_vars {
-		// fmt.Printf("\n%s\n", key)
 		dark_css_vars_rgb[key] = Darkify(value, mid_point_sum)
 	}
 	fmt.Println("@media (prefers-color-schmeme: dark) {")
