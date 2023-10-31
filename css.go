@@ -22,6 +22,21 @@ func Parse_args() (string, [3]uint8) {
 	return input_file, dark_bg_rgb
 }
 
+// Convert a rgb(a) string (css notation) to int array
+// e.G. rgb(255, 0, 0) > [255, 0, 0]
+func Css_rgb_to_rgb(rgb_str string) [3]uint8 {
+	rgb_str_arr := strings.Split(rgb_str, ",")
+	var rgb [3]uint8
+	for i, segment := range rgb_str_arr {
+		segment_int, err := strconv.ParseUint(segment, 10, 8)
+		if err != nil {
+			panic("Cannot parse " + rgb_str + " to int array. Ensure that arguments and data in the input file are valid hex")
+		}
+		rgb[i] = uint8(segment_int)
+	}
+	return rgb
+}
+
 // converts a hex string to a int array
 // e.G. #ff0000 > [255, 0, 0]
 func Hex_str_to_rgb(hex_str_rgb string) [3]uint8 {
@@ -51,7 +66,7 @@ func Hex_str_to_rgb(hex_str_rgb string) [3]uint8 {
 	blue_dec, blue_err := strconv.ParseUint(blue_hex, 16, 8)
 
 	if red_err != nil || green_err != nil || blue_err != nil {
-		panic(hex_str_rgb + " to int array. Ensure that arguments and data in the input file are valid hex")
+		panic("Cannot parse " + hex_str_rgb + " to int array. Ensure that arguments and data in the input file are valid hex")
 	}
 
 	var rgb [3]uint8
@@ -97,11 +112,15 @@ func Read_input_file(input_file_path string) map[string][3]uint8 {
 	var input_lines []string
 
 	// CSS var names must be alphanum with - or _
-	css_var_re, _ := regexp.Compile(`--[0-9a-zA-Z\-_]+:\s*#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?\s*;`)
+	css_var_re, _ := regexp.Compile(`--[0-9a-zA-Z\-_]+:\s*.*;`)
+	css_var_hex_re, _ := regexp.Compile(`--[0-9a-zA-Z\-_]+:\s*#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?\s*;`)
+	css_var_rgb_re, _ := regexp.Compile(`--[0-9a-zA-Z\-_]+:\s*rgba?\([0-9]{1,3},\s*[0-9]{1,3},\s*[0-9]{1,3}\);`)
 	for scanner.Scan() {
 		var input_line = scanner.Text()
 		if css_var_re.Match([]byte(input_line)) {
-			input_lines = append(input_lines, scanner.Text())
+			if css_var_rgb_re.Match([]byte(input_line)) || css_var_hex_re.Match([]byte(input_line)) {
+				input_lines = append(input_lines, scanner.Text())
+			}
 		}
 	}
 	inputFile.Close()
@@ -117,14 +136,22 @@ func extract_css_vars(input_lines []string) map[string][3]uint8 {
 	replacer := strings.NewReplacer(" ", "",
 		"\t", "",
 		"-", "",
-		";", "")
+		";", "",
+		"(", "",
+		")", "",
+		"rgb", "",
+		"rgba", "")
 
 	for _, input_line := range input_lines {
 		line_trimmed := replacer.Replace(input_line)
 		rgb_name_and_val := strings.Split(line_trimmed, ":")
 		rgb_name := rgb_name_and_val[0]
 		rgb_val := rgb_name_and_val[1]
-		css_vars[rgb_name] = Hex_str_to_rgb(rgb_val)
+		if strings.HasPrefix(rgb_val, "#") {
+			css_vars[rgb_name] = Hex_str_to_rgb(rgb_val)
+		} else {
+			css_vars[rgb_name] = Css_rgb_to_rgb(rgb_val)
+		}
 	}
 	return css_vars
 }
