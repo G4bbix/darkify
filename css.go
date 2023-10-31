@@ -11,15 +11,22 @@ import (
 )
 
 // Parse command line args for css
-func Parse_args() (string, [3]uint8) {
+func Parse_args() (string, [3]uint8, string) {
 	var dark_bg string
 	var input_file string
+	var output_format string
 	flag.StringVar(&dark_bg, "d", "#000000", "Dark background (as # followed by 6 digit hex string)")
 	flag.StringVar(&input_file, "f", "", "Input file containing the css vars")
+	flag.StringVar(&output_format, "o", "hex", "Output format (rgb|hex)")
+
 	flag.Parse()
 
+	if output_format != "rgb" && output_format != "hex" {
+		panic("Invalid value for parameter -o only rgb or hex is allowed")
+	}
+
 	dark_bg_rgb := Hex_str_to_rgb(dark_bg)
-	return input_file, dark_bg_rgb
+	return input_file, dark_bg_rgb, output_format
 }
 
 // Convert a rgb(a) string (css notation) to int array
