@@ -8,12 +8,14 @@ usage: darkify [-h|--help] -i|--inputFile "<value>" [-b|--new-bg "<value>"]
   
 ## Arguments:
 
-  -h  --help       Print help information
-  
-  -i  --inputFile  File with CSS light var definitons
-  
-  -b  --new-bg     The hexcode of the desired background. Default: #222
-  
+  -h  Print help information
+
+  -i  File with CSS light var definitons
+
+  -b  The hexcode of the desired background. Default: #000000
+
+  -o  Output format can be hex or rgb Default: hex
+
   
 ``` 
 Example output (example.css)
