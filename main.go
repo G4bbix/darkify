@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -9,6 +10,11 @@ import (
 type Rgb struct {
 	color [3]uint8
 	alpha uint8
+}
+
+func round_float(value float64, precision uint) float64 {
+	ratio := math.Pow(10, float64(precision))
+	return math.Round(value*ratio) / ratio
 }
 
 func format_css_var(name string, value Rgb, format string, indent_level int) string {
@@ -22,7 +28,7 @@ func format_css_var(name string, value Rgb, format string, indent_level int) str
 		if value.alpha == 255 {
 			value_formatted = fmt.Sprintf("rgb(%d, %d, %d)", value.color[0], value.color[1], value.color[2])
 		} else {
-			alpha := strconv.FormatFloat(float64(value.alpha)/255, 'f', -2, 32)
+			alpha := strconv.FormatFloat(round_float(float64(value.alpha)/255, 2), 'f', -1, 32)
 			value_formatted = fmt.Sprintf("rgba(%d, %d, %d, %s)", value.color[0], value.color[1], value.color[2], alpha)
 		}
 	}
