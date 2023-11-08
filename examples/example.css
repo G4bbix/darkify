@@ -7,7 +7,8 @@
   --colorHeading: #9fae30;
   --colorHeading2: #404000;
   --colorHeading3: #003fc0;
-  --colorHeading4: rgb(172, 100, 0);
-  --colorHeading5: rgba(172, 100, 0, 0.8);
-  --colorHeading6: #ffffff99;
+  --alphaRgb1: rgba(172, 100, 0, 0.5);
+  --alphaRgb2: rgba(172, 100, 215, 0.25);
+  --hexRgb1: #250912a0;
+  --hexRgb2: #efffef50;
 }
