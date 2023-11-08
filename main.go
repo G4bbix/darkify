@@ -2,34 +2,47 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
-func format_css_var(name string, value [3]uint8, format string, indent_level int) string {
+type Rgb struct {
+	color [3]uint8
+	alpha uint8
+}
+
+func format_css_var(name string, value Rgb, format string, indent_level int) string {
 	var value_formatted string
 	if format == "hex" {
-		value_formatted = Int_arr_to_hex_str(value)
+		value_formatted = Int_arr_to_hex_str(value.color)
+		if value.alpha != 255 {
+			value_formatted = fmt.Sprintf("%s%s", value_formatted, fmt.Sprintf("%x", value.alpha))
+		}
 	} else if format == "rgb" {
-		value_formatted = fmt.Sprintf("rgb(%d,%d,%d)", value[0], value[1], value[2])
+		if value.alpha == 255 {
+			value_formatted = fmt.Sprintf("rgb(%d, %d, %d)", value.color[0], value.color[1], value.color[2])
+		} else {
+			alpha := strconv.FormatFloat(float64(value.alpha)/255, 'f', -2, 32)
+			value_formatted = fmt.Sprintf("rgba(%d, %d, %d, %s)", value.color[0], value.color[1], value.color[2], alpha)
+		}
 	}
 	return fmt.Sprintf("%s--%s: %s;\n", strings.Repeat("\t", indent_level), name, value_formatted)
 }
 
 func main() {
 
-	/* default bg color, will be the replacement for white
-	   based on this all other colors will be calculated */
 	input_file_path, dark_bg_rgb, output_format := Parse_args()
-	light_css_vars := Read_input_file(input_file_path)
-	var light_bg_rgb = [3]uint8{255, 255, 255}
 
-	mid_point_sum := Calc_midpoint_sum(light_bg_rgb, dark_bg_rgb)
+	light_css_vars := Read_input_file(input_file_path)
+	light_bg_rgb := Rgb{color: [3]uint8{255, 255, 255}, alpha: 255}
+
+	mid_point_sum := Calc_midpoint_sum(light_bg_rgb.color, dark_bg_rgb.color)
 	// fmt.Println(mid_point_sum)
-	var dark_css_vars_rgb = make(map[string][3]uint8)
+	var dark_css_vars_rgb = make(map[string]Rgb)
 	fmt.Println(":root {")
 	for key, value := range light_css_vars {
 		fmt.Printf("%s", format_css_var(key, value, output_format, 1))
-		dark_css_vars_rgb[key] = Darkify(value, mid_point_sum)
+		dark_css_vars_rgb[key] = Rgb{color: Darkify(value.color, mid_point_sum), alpha: value.alpha}
 	}
 	fmt.Println("}")
 
