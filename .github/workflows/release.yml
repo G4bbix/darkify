@@ -17,6 +17,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: linux
         goarch: amd64
+        project_path: ./src
 
   release-windows-amd64:
     name: release windows/amd64
@@ -28,3 +29,4 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: windows
         goarch: amd64
+        project_path: ./src
