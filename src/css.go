@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"regexp"
@@ -18,6 +19,7 @@ func Read_input_file(input_file_path string) []Rgb {
 	inputFile, err := os.Open(input_file_path)
 	if err != nil {
 		fmt.Println("Failed to open input file")
+		flag.Usage()
 		os.Exit(1)
 	}
 	defer inputFile.Close()
